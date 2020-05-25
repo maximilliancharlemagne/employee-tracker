@@ -1,8 +1,11 @@
 const { prompt } = require('inquirer')
 
+require('dotenv').config()
+
 const libs = require('./lib')
 
 const mainMenuLauncher = () => {
+  console.log(`calling mainMenuLauncher`)
   const mainMenuChoices = ['Add Department', 'Add Role', 'Add Employee', 'View Departments', 'View Roles', 'View Employees', 'Update Employee Role']
 
   const mainMenuPrompt = {
