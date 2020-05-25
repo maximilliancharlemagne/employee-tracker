@@ -73,11 +73,11 @@ const addHandler = (table) => {
               .catch(err => console.log(err))
             break;
           case 'employee':
-            simpleEmployees = []
+            let simpleEmployees = []
             validEmployees.forEach(element => {
               simpleEmployees.push(element.first_name +' '+ element.last_name)
             })
-            simpleRoles = []
+            let simpleRoles = []
             validRoles.forEach(element => {
               simpleRoles.push(element.title)
             })
@@ -128,9 +128,70 @@ const addHandler = (table) => {
 }
 
 const updateHandler = (table, others) => {
-  console.log(updateHandler)
-  console.log(table)
-  console.log(others)
+  const connection = mysql.createConnection({
+    host: 'localhost',
+    database: 'company_db',
+    port: 3306,
+    user: 'root',
+    password: process.env.DB_PASS
+  })
+
+  let propertyToUpdate = others[0]
+
+  connection.query('SELECT * FROM department;', (err, results) => {
+    let validDepartments = results
+    connection.query('SELECT * FROM role;', (err, results) => {
+      let validRoles = results
+      connection.query('SELECT * FROM employee;', (err, results) => {
+        let validEmployees = results
+        let simpleEmployees = []
+        validEmployees.forEach(element => {
+          simpleEmployees.push(element.first_name + ' ' + element.last_name)
+        })
+        let simpleRoles = []
+        validRoles.forEach(element => {
+          simpleRoles.push(element.title)
+        })
+
+        switch (table) {
+          case 'employee':
+            switch (propertyToUpdate) {
+              case 'role':
+                const employeePrompt = {
+                  type: 'list',
+                  name: 'employee',
+                  message: 'Which employee\'s role would you like to change?',
+                  choices: simpleEmployees
+                }
+                const rolePrompt = {
+                  type: 'list',
+                  name: 'newRole',
+                  message: 'What would you like to change their role to?',
+                  choices: simpleRoles
+                }
+                prompt([employeePrompt,rolePrompt])
+                .then(data => {
+                  let roleID = validRoles.find(element => element.title == data.newRole).id
+                  connection.query(`UPDATE ${table} SET role_id = ${roleID} WHERE first_name = "${data.employee.split(' ')[0]}" AND last_name = "${data.employee.split(' ')[1]}";`,(err,results) => {
+                    if(err){console.log(err)}
+                    connection.end()
+                    console.log(`Updated ${table} ${data.employee}: ${propertyToUpdate} changed to ${data.newRole}`)
+                    mainMenuLauncher()
+                  })
+                })
+                break;
+
+              default:
+                break;
+            }
+            break;
+
+          default:
+            break;
+        }
+      })
+    })
+  })
 }
 
 const viewHandler = (table) => {
