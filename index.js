@@ -1,5 +1,7 @@
 const { prompt } = require('inquirer')
 
+const libs = require('./lib')
+
 const mainMenuLauncher = () => {
   const mainMenuChoices = ['Add Department', 'Add Role', 'Add Employee', 'View Departments', 'View Roles', 'View Employees', 'Update Employee Role']
 
@@ -21,9 +23,11 @@ const mainMenuLauncher = () => {
       if (table[table.length - 1] == 's') {
         table = table.substring(0, table.length - 1)
       }
-      actionHandler(op, table, others)
+      libs.actionHandler(op, table, others)
     })
     .catch(err => console.log(err))
 }
+
+mainMenuLauncher()
 
 module.exports = mainMenuLauncher
