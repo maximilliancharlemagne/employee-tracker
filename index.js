@@ -2,6 +2,7 @@ require('dotenv').config()
 
 const { prompt } = require('inquirer')
 const mysql = require('mysql2')
+const cTable = require('console.table');
 
 const addHandler = (table) => {
   console.log(`calling addHandler`)
@@ -195,12 +196,59 @@ const updateHandler = (table, others) => {
 }
 
 const viewHandler = (table) => {
-  console.log(viewHandler)
-  console.log(table)
+  const connection = mysql.createConnection({
+    host: 'localhost',
+    database: 'company_db',
+    port: 3306,
+    user: 'root',
+    password: process.env.DB_PASS
+  })
+
+  switch (table) {
+    case 'employee':
+      connection.query(`SELECT employee.id, first_name, last_name, title, salary, name, manager_id FROM ${table} INNER JOIN role ON ${table}.role_id = role.id INNER JOIN department on role.department_id = department.id;`, (err, results) => {
+        if (err) { console.log(err) }
+        results.forEach(thisElement => {
+          thisElement.department = thisElement.name
+          delete thisElement.name
+          if(!thisElement.manager_id){
+            thisElement.manager = 'None'
+          }
+          else{
+            let myManager = results.find(thatElement => thatElement.id == thisElement.manager_id)
+            thisElement.manager = myManager.first_name + ' ' + myManager.last_name
+          }
+          delete thisElement.manager_id
+        })
+        console.table(results)
+        connection.end()
+        mainMenuLauncher()
+      })
+      break;
+    case 'role':
+      connection.query(`SELECT role.id, title, salary, name FROM ${table} INNER JOIN department ON ${table}.department_id = department.id;`, (err, results) => {
+        if (err) { console.log(err) }
+        results.forEach(thisElement => {
+          thisElement.department = thisElement.name
+          delete thisElement.name
+        })
+        console.table(results)
+        connection.end()
+        mainMenuLauncher()
+      })
+      break;
+    case 'department':
+      connection.query(`SELECT * from ${table};`, (err, results) => {
+        console.table(results)
+        connection.end()
+        mainMenuLauncher()
+      })
+    default:
+      break;
+  }
 }
 
 const actionHandler = (op, table, others) => {
-  console.log(`calling actionHandler`)
   switch (op) {
     case 'add':
       addHandler(table)
