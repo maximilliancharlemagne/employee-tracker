@@ -43,6 +43,28 @@ const addHandler = (table) => {
               .catch(err => console.log(err))
             break;
           case 'role':
+            const roleTitlePrompt = {
+              name: 'title',
+              type: 'input',
+              message: 'What is the title of the new role?'
+            }
+            const roleSalaryPrompt = {
+              name: 'salary',
+              type: 'input',
+              message: 'What is the salary of the new role?'
+            }
+            const roleDeptPrompt = {
+              name: 'dept',
+              type:  'list',
+              message: 'Which department is the new role in?',
+              choices: validDepartments
+            }
+            const rolePrompts = [roleTitlePrompt,roleSalaryPrompt,roleDeptPrompt]
+            prompt(rolePrompts)
+              .then(data => {
+                console.log(data)
+                })
+              .catch(err => console.log(err))
             break;
           case 'employee':
             break;
