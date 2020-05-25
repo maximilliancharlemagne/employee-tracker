@@ -62,11 +62,61 @@ const addHandler = (table) => {
             const rolePrompts = [roleTitlePrompt,roleSalaryPrompt,roleDeptPrompt]
             prompt(rolePrompts)
               .then(data => {
-                console.log(data)
+                let deptID = validDepartments.find(element => element.name == data.dept).id
+                connection.query(`INSERT INTO ${table}(title,salary,department_id) VALUES("${data.title}",${data.salary},${deptID});`, (err, results) => {
+                  if(err){console.log(err)}
+                  connection.end()
+                  console.log(`Added new ${table}: ${data.title}`)
+                  mainMenuLauncher()
+                })
                 })
               .catch(err => console.log(err))
             break;
           case 'employee':
+            simpleEmployees = []
+            validEmployees.forEach(element => {
+              simpleEmployees.push(element.first_name +' '+ element.last_name)
+            })
+            simpleRoles = []
+            validRoles.forEach(element => {
+              simpleRoles.push(element.title)
+            })
+            const employeeNamePrompt = {
+              name: 'name',
+              type: 'input',
+              message: 'What is the new employee\'s name? (Firstname Lastname)'
+            }
+            const employeeManagerPrompt = {
+              name: 'manager',
+              type: 'list',
+              message: 'Who is the new employee\'s manager?',
+              choices: simpleEmployees.concat(['null'])
+            }
+            const employeeRolePrompt = {
+              name: 'role',
+              type: 'list',
+              message: 'What is the new employee\'s role?',
+              choices: simpleRoles
+            }
+            const employeePrompts = [employeeNamePrompt, employeeManagerPrompt, employeeRolePrompt]
+            prompt(employeePrompts)
+              .then(data => {
+                let roleID = validRoles.find(element => element.title == data.role).id
+                let managerID
+                if(data.manager == 'null'){
+                  managerID = 'null'
+                }
+                else{
+                  managerID = validEmployees.find(element => element.first_name == data.manager.split(' ')[0] && element.last_name == data.manager.split(' ')[1]).id
+                }
+                connection.query(`INSERT INTO ${table}(first_name,last_name,role_id,manager_id) VALUES("${data.name.split(' ')[0]}","${data.name.split(' ')[1]}",${roleID},${managerID});`, (err, results) => {
+                  if (err) { console.log(err) }
+                  connection.end()
+                  console.log(`Added new ${table}: ${data.title}`)
+                  mainMenuLauncher()
+                })
+              })
+              .catch(err => console.log(err))
             break;
           default:
             console.log('Error! invalid table')
