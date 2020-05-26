@@ -6,9 +6,9 @@ const cTable = require('console.table');
 
 const addHandler = (table) => {
   console.log(`calling addHandler`)
-  const deptAttributes = ['name']
-  const roleAttributes = ['title', 'salary', 'department_id']
-  const employeeAttributes = ['first_name', 'last_name', 'role_id', 'manager_id']
+  // const deptAttributes = ['name']
+  // const roleAttributes = ['title', 'salary', 'department_id']
+  // const employeeAttributes = ['first_name', 'last_name', 'role_id', 'manager_id']
 
   const connection = mysql.createConnection({
     host: 'localhost',
