@@ -243,6 +243,7 @@ const viewHandler = (table) => {
         connection.end()
         mainMenuLauncher()
       })
+          break;
     default:
       break;
   }
